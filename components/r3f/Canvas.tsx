@@ -7,6 +7,7 @@ import { Env } from "./Env";
 
 
 import { Box } from "./Box";
+import { Torus } from "./Torus";
 
 export const R3FCanvas = () => {  
   const [enableZoom, setEnableZoom] = useState(true);  
@@ -34,7 +35,7 @@ export const R3FCanvas = () => {
         gl={{ preserveDrawingBuffer: true }}
         camera={{ position: [0, 0, 4.5], fov: 50 }}
       >
-        <Box/>
+        <Torus/>
         <ambientLight intensity={0.2} />
         <Env />
         <OrbitControls
