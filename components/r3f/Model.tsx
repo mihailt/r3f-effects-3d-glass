@@ -10,7 +10,7 @@ import state from "@/lib/store";
 import { useSnapshot } from "valtio";
 import { getGeometryFor } from "@/lib/utils";
 
-export const Model = ({name}: { name: string}) => {
+export const Model = ({name, transsmisive = true}: { name: string, transsmisive?: boolean}) => {
   
   const snap = useSnapshot(state);    
   const { nodes, materials } = useGLTF(`./models/${name}`)
@@ -76,6 +76,7 @@ export const Model = ({name}: { name: string}) => {
         geometry={geometry}
         material={materials.Default}       
       >
+        {transsmisive && 
           <MeshTransmissionMaterial 
             color={color}
             thickness={snap.thickness} 
@@ -84,6 +85,7 @@ export const Model = ({name}: { name: string}) => {
             ior={snap.ior}
             backside={snap.backside}
           />
+        }
       </mesh>
     </group>
   )
