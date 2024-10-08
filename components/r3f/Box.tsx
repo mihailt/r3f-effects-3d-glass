@@ -1,15 +1,11 @@
 "use client"
 import React, { useRef, useState, useTransition } from "react";
-import { useControls} from "leva";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, } from "@react-three/drei";
-import { Env } from "./Env";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three'; // Ensure THREE is imported
-import { useSpring } from '@react-spring/three'
-
+import { useSpring, config } from "@react-spring/three";
 
 export const Box = (
-  { hovered: initialHovered = false, active: initialActive = false, ...props }
+  { hovered: initialHovered = false, active: initialActive = false}
   :{ hovered?: boolean; active?: boolean; }
 ) => {
 
@@ -18,7 +14,20 @@ export const Box = (
   // Set up state for the hovered and active state
   const [hovered, setHover] = useState(initialHovered)
   const [active, setActive] = useState(initialActive)
+
+  const [color, setColor] = useState('orange')
+  const [scale, setSetScale] = useState(0.8)
   // Subscribe this component to the render-loop, rotate the mesh every frame
+  useSpring({
+    color: hovered ? 'hotpink' : 'orange',
+    scale: active ? 1.2 : 0.8,
+    config: config.wobbly,
+    onChange: ({ value }) => {
+      setSetScale(value.scale)
+      setColor(value.color)
+    },
+  },[active, hovered]);
+
   useFrame((state, delta) => {
     if (meshRef.current) {
       meshRef.current.rotation.x += delta;
@@ -26,18 +35,16 @@ export const Box = (
       meshRef.current.rotation.z += delta;
     }
   })
-  // Return view, these are regular three.js elements expressed in JSX
+
   return (
-    <mesh
-      {...props}
+      <mesh
       ref={meshRef}
-      scale={active ? 1.5 : 1}
+      scale={scale}
       onClick={(event) => setActive(!active)}
       onPointerOver={(event) => setHover(true)}
       onPointerOut={(event) => setHover(false)}>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
+      <meshStandardMaterial color={color} />
     </mesh>
   )
 }
-

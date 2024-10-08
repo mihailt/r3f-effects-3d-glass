@@ -1,11 +1,11 @@
 "use client"
-import React, { useRef, useState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { useControls} from "leva";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, } from "@react-three/drei";
 import { Env } from "./Env";
-import * as THREE from 'three'; // Ensure THREE is imported
-import { useSpring } from '@react-spring/three'
+
+
 import { Box } from "./Box";
 
 export const R3FCanvas = () => {  
