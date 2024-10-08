@@ -5,28 +5,13 @@ import { useControls} from "leva";
 import { Environment } from "@react-three/drei";
 import { PresetsType } from "@react-three/drei/helpers/environment-assets";
 
-export const Env = () => {
-  const [preset, setPreset] = useState<PresetsType>("sunset");
-  const [inTransition, startTransition] = useTransition();
-  const { blur } = useControls({
-    preset: {
-      label: "Env.",
-      value: preset,
-      options: [
-        "sunset",
-        "dawn",
-        "night",
-        "warehouse",
-        "forest",
-        "apartment",
-        "studio",
-        "city",
-        "park",
-        "lobby",
-      ],
-      onChange: (value) => startTransition(() => setPreset(value)),
-    },
-    blur: { label: "Env. blur", value: 0.65, min: 0, max: 1 },
-  });
-  return <Environment preset={preset} background backgroundBlurriness={blur} />;
+import state from "@/lib/store";
+import { useSnapshot } from "valtio";
+
+export const Env = () => {  
+  const snap = useSnapshot(state);      
+  return <Environment 
+    preset={snap.preset} 
+    background={snap.background} 
+    backgroundBlurriness={snap.blur} />;
 }
