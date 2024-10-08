@@ -1,36 +1,36 @@
 "use client"
 
-import React, { useRef, useState, useTransition } from "react";
+import React, { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Text, MeshTransmissionMaterial } from '@react-three/drei'
-import * as THREE from 'three'; // Ensure THREE is imported
+import * as THREE from 'three';
 import { useSpring, config } from "@react-spring/three";
-import { useControls} from "leva";
 
 import state from "@/lib/store";
 import { useSnapshot } from "valtio";
+import { getGeometryFor } from "@/lib/utils";
 
-export const Torus = () => {
-  const name = 'Torus.glb';
+export const Model = ({name}: { name: string}) => {
   
   const snap = useSnapshot(state);    
   const { nodes, materials } = useGLTF(`./models/${name}`)
   const { viewport } = useThree();
   
-  const geometryName = name.replace('.glb', '').charAt(0).toUpperCase() + name.slice(1).replace('.glb', '');
-  // @ts-ignore
+  const geometryName = getGeometryFor(name)
+  // @ts-expect-error ts error - Property 'geometry' does not exist on type 'Object3D<Object3DEventMap>'
   const geometry = nodes[geometryName]?.geometry;  
 
   // This reference will give us direct access to the mesh
-  const meshRef = useRef<THREE.Mesh>(null); // Ensure meshRef is typed correctly
+  const meshRef = useRef<THREE.Mesh>(null);
   // Set up state for the hovered and active state
   const [hovered, setHover] = useState(false)
   const [active, setActive] = useState(false)
   const [color, setColor] = useState(snap.color.default)
-  const [scale, setSetScale] = useState(viewport.width / snap.viewportWidthFactor * (active ? snap.scale.active : snap.scale.default))
-  // Subscribe this component to the render-loop, rotate the mesh every frame
+  const [scale, setScale] = useState(active ? snap.scale.active : snap.scale.default)
+  const [viewportScale, setViewportScale] = useState(viewport.width / snap.viewportWidthFactor * scale)  
+   
   const tColor = new THREE.Color(color);
-  // @ts-ignore
+  // @ts-expect-error Property 'color' does not exist on type 'Material'
   materials.Default.color = tColor;
 
   useSpring({
@@ -38,10 +38,11 @@ export const Torus = () => {
     scale: active ? snap.scale.active : snap.scale.default,
     config: config.wobbly,
     onChange: ({ value }) => {
-      setSetScale(value.scale)
+      setScale(value.scale)
+      setViewportScale(viewport.width / snap.viewportWidthFactor * value.scale)
       setColor(value.color)
       tColor.set(value.color)
-      // @ts-ignore
+      // @ts-expect-error Property 'color' does not exist on type 'Material'
       materials.Default.color = tColor;
     },
   },[active, hovered, snap.scale.active, snap.scale.default, snap.color.active, snap.color.default]);
@@ -52,7 +53,6 @@ export const Torus = () => {
     }
   })
 
-  const [inTransition, startTransition] = useTransition();
   const textColor = new THREE.Color(snap.textColor);
 
   return (
@@ -67,16 +67,17 @@ export const Torus = () => {
       </Text>
       <mesh
         ref={meshRef}
-        scale={viewport.width / snap.viewportWidthFactor * scale}
-        onClick={(event) => setActive(!active)}
-        onPointerOver={(event) => setHover(true)}
-        onPointerOut={(event) => setHover(false)}
+        scale={viewportScale}
+        onClick={() => {setActive(!active); state.background = !state.background}}
+        onPointerOver={() => setHover(true)}
+        onPointerOut={() => setHover(false)}
         castShadow
         receiveShadow
         geometry={geometry}
         material={materials.Default}       
       >
           <MeshTransmissionMaterial 
+            color={color}
             thickness={snap.thickness} 
             roughness={snap.roughness} 
             transmission={snap.transmission}

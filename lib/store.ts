@@ -31,19 +31,21 @@ interface Config {
     font: string
     fontSize: number
 
-    thickness: number,
-    roughness: number,
-    transmission: number,
-    ior: number,
-    chromaticAberration: number,
-    backside: boolean,
+    thickness: number
+    roughness: number
+    transmission: number
+    ior: number
+    chromaticAberration: number
+    backside: boolean
+
     preload: string[]
+    model: string
 }
 
 const config: Config = {
     blur: 0.65,
 
-    preset: "night",
+    preset: "city",
     options: [
         "sunset",
         "dawn",
@@ -89,7 +91,8 @@ const config: Config = {
     ior: 1.2,
     chromaticAberration: 0.02,
     backside: true,
-    preload: ['/Torus.glb']
+    preload: ['/Torus.glb'],
+    model: 'Torus.glb'
 };
 
 const state = proxy<Config>(config);

@@ -1,16 +1,18 @@
 "use client"
-import React, { useState, useTransition } from "react";
-import { useControls} from "leva";
+import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, } from "@react-three/drei";
 import { Env } from "./Env";
-import { Torus } from "./Torus";
+import { Model } from "./Model";
+import { useGLTF} from '@react-three/drei'
 
 import state from "@/lib/store";
 import { useSnapshot } from "valtio";
 
 export const R3FCanvas = () => {  
   const snap = useSnapshot(state);    
+
+  snap.preload.map((path) => useGLTF.preload(path))
 
   return (
       <Canvas
@@ -20,7 +22,7 @@ export const R3FCanvas = () => {
         gl={{ preserveDrawingBuffer: true }}
         camera={{ position: [0, 0, 4.5], fov: 50 }}
       >
-        <Torus/>
+        <Model name={snap.model}/>
         <directionalLight intensity={snap.lightIntensity} position={[0, 3, 2]}/>
         <Env />
         <OrbitControls
